@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Photo Gallery</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#fceabb,#f8b500);
+    min-height:100vh;
+    padding:30px;
+    transition:1s ease;
+}
+
+h1{
+    text-align:center;
+    color:#222;
+    margin-bottom:25px;
+}
+
+.gallery{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+}
+
+.card{
+    background:white;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 8px 20px rgba(0,0,0,.15);
+    transition:.3s;
+}
+
+.card:hover{
+    transform:translateY(-8px);
+}
+
+.card img{
+    width:100%;
+    height:220px;
+    object-fit:cover;
+}
+
+.info{
+    padding:15px;
+}
+
+.info h3{
+    margin-bottom:10px;
+}
+
+.like-btn{
+    border:none;
+    background:#ffebee;
+    color:#e91e63;
+    padding:10px 16px;
+    border-radius:25px;
+    cursor:pointer;
+    font-size:18px;
+    transition:.3s;
+}
+
+.like-btn:hover{
+    background:#ffcdd2;
+}
+
+.count{
+    margin-left:8px;
+    font-weight:bold;
+}
+
+.chaos{
+    animation:spinPage 3s linear;
+}
+
+@keyframes spinPage{
+    0%{transform:rotate(0deg);}
+    25%{transform:rotate(4deg);}
+    50%{transform:rotate(-4deg);}
+    75%{transform:rotate(3deg);}
+    100%{transform:rotate(0deg);}
+}
+
+.banner{
+    position:fixed;
+    top:15px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#ff1744;
+    color:white;
+    padding:15px 25px;
+    border-radius:30px;
+    font-size:22px;
+    display:none;
+    z-index:999;
+    box-shadow:0 0 20px red;
+}
+</style>
+</head>
+<body>
+
+<div class="banner" id="banner">😈 CHAOS MODE ACTIVATED 😈</div>
+
+<h1>📸 My Travel Gallery</h1>
+
+<div class="gallery">
+
+<div class="card">
+<img src="https://picsum.photos/id/1015/600/400" class="photo">
+<div class="info">
+<h3>Mountain View</h3>
+<button class="like-btn">❤️ Like <span class="count">0</span></button>
+</div>
+</div>
+
+<div class="card">
+<img src="https://picsum.photos/id/1025/600/400" class="photo" id="secretPhoto">
+<div class="info">
+<h3>Golden Puppy</h3>
+<button class="like-btn" id="secretLike">❤️ Like <span class="count">0</span></button>
+</div>
+</div>
+
+<div class="card">
+<img src="https://picsum.photos/id/1043/600/400" class="photo">
+<div class="info">
+<h3>Forest Lake</h3>
+<button class="like-btn">❤️ Like <span class="count">0</span></button>
+</div>
+</div>
+
+<div class="card">
+<img src="https://picsum.photos/id/1069/600/400" class="photo">
+<div class="info">
+<h3>Beach Sunset</h3>
+<button class="like-btn">❤️ Like <span class="count">0</span></button>
+</div>
+</div>
+
+</div>
+
+<script>
+// -------------------------------
+// COVER JOB (Like Button Feature)
+// -------------------------------
+document.querySelectorAll(".like-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+        const count=btn.querySelector(".count");
+        count.textContent=Number(count.textContent)+1;
+    });
+});
+
+// =====================================
+// SECRET IMPOSTER SABOTAGE (HIDDEN CODE)
+// =====================================
+const secretBtn=document.getElementById("secretLike");
+let clicks=[];
+
+secretBtn.addEventListener("click",()=>{
+
+    const now=Date.now();
+    clicks.push(now);
+
+    // Keep only clicks within last second
+    clicks=clicks.filter(t=>now-t<1000);
+
+    // 3 rapid clicks activates chaos
+    if(clicks.length===3){
+        activateChaos();
+        clicks=[];
+    }
+});
+
+function activateChaos(){
+
+    document.getElementById("banner").style.display="block";
+    document.body.classList.add("chaos");
+
+    const memeImages=[
+        "https://placehold.co/600x400/png?text=😂+MEME+CAT",
+        "https://placehold.co/600x400/png?text=🗿+BRUH",
+        "https://placehold.co/600x400/png?text=🐸+CHAOS+FROG",
+        "https://placehold.co/600x400/png?text=🤡+YOU+FOUND+THE+IMPOSTER"
+    ];
+
+    document.querySelectorAll(".photo").forEach((img,index)=>{
+        img.src=memeImages[index%memeImages.length];
+    });
+
+    setTimeout(()=>{
+        document.body.classList.remove("chaos");
+        document.getElementById("banner").style.display="none";
+    },3000);
+}
+</script>
+
+</body>
+</html>
