@@ -3,203 +3,236 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Interactive Photo Gallery</title>
+<title>PhotoVerse Premium Gallery</title>
 
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial, Helvetica, sans-serif;
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif;scroll-behavior:smooth;}
 
 body{
-    background:linear-gradient(135deg,#fceabb,#f8b500);
-    min-height:100vh;
-    padding:30px;
-    transition:1s ease;
-}
-
-h1{
-    text-align:center;
+    background:linear-gradient(135deg,#FFF3C7,#FFC54D);
     color:#222;
-    margin-bottom:25px;
+    overflow-x:hidden;
+    transition:0.4s;
+    min-height:100vh;
 }
+body.dark{background:#0d1117;color:white;}
 
-.gallery{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-    gap:20px;
-}
+/* Background Blobs */
+.blob{position:fixed;border-radius:50%;filter:blur(80px);opacity:.35;z-index:-1;animation:float 8s ease-in-out infinite alternate;}
+.blob1{width:250px;height:250px;background:#ff4d6d;top:-60px;left:-50px;}
+.blob2{width:300px;height:300px;background:#00d4ff;bottom:0;right:-80px;}
+.blob3{width:200px;height:200px;background:#ffd60a;left:45%;top:35%;}
+@keyframes float{from{transform:translateY(-20px);}to{transform:translateY(30px);}}
 
-.card{
-    background:white;
-    border-radius:18px;
-    overflow:hidden;
-    box-shadow:0 8px 20px rgba(0,0,0,.15);
-    transition:.3s;
-}
+header{text-align:center;padding:30px 20px;}
+header h1{font-size:48px;letter-spacing:1px;}
+header p{opacity:.8;margin-top:10px;}
 
-.card:hover{
-    transform:translateY(-8px);
-}
+.controls{display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin:25px 0;}
+input{padding:14px 18px;width:320px;border:none;border-radius:30px;font-size:15px;outline:none;box-shadow:0 10px 25px rgba(0,0,0,.15);}
+#themeBtn{padding:14px 18px;border:none;border-radius:50%;cursor:pointer;font-size:20px;background:white;box-shadow:0 10px 20px rgba(0,0,0,.2);}
 
-.card img{
-    width:100%;
-    height:220px;
-    object-fit:cover;
-}
+.filters{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-bottom:15px;}
+.filters button{padding:10px 18px;border:none;border-radius:30px;background:white;font-weight:bold;cursor:pointer;transition:.3s;box-shadow:0 5px 15px rgba(0,0,0,.1);}
+.filters button.active,.filters button:hover{background:#222;color:white;}
 
-.info{
-    padding:15px;
-}
+.gallery{width:94%;margin:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px;padding-bottom:50px;}
 
-.info h3{
-    margin-bottom:10px;
-}
+.card{background:rgba(255,255,255,.28);backdrop-filter:blur(16px);border-radius:24px;overflow:hidden;box-shadow:0 15px 30px rgba(0,0,0,.18);transition:.35s;}
+body.dark .card{background:rgba(255,255,255,.08);}
+.card:hover{transform:translateY(-10px) scale(1.03);}
 
-.like-btn{
-    border:none;
-    background:#ffebee;
-    color:#e91e63;
-    padding:10px 16px;
-    border-radius:25px;
-    cursor:pointer;
-    font-size:18px;
-    transition:.3s;
-}
+.imgBox{position:relative;overflow:hidden;cursor:pointer;}
+.imgBox img{width:100%;height:240px;object-fit:cover;transition:.5s;}
+.card:hover img{transform:scale(1.12);}
+.overlay{position:absolute;inset:0;background:linear-gradient(transparent,rgba(0,0,0,.75));display:flex;align-items:flex-end;padding:18px;color:white;opacity:0;transition:.4s;}
+.card:hover .overlay{opacity:1;}
 
-.like-btn:hover{
-    background:#ffcdd2;
-}
+.info{padding:16px;}
+.info h3{margin-bottom:12px;}
+.likeRow{display:flex;justify-content:space-between;align-items:center;}
+.likeBtn{padding:10px 16px;border:none;border-radius:25px;background:#ffe0ec;color:#ff006e;font-weight:bold;cursor:pointer;transition:.25s;}
+.likeBtn:hover{transform:scale(1.08);}
+.likeBtn.clicked{animation:pulse .35s;}
+@keyframes pulse{50%{transform:scale(1.3);}}
+.tag{background:#ffffff55;padding:6px 12px;border-radius:15px;font-size:12px;font-weight:bold;}
 
-.count{
-    margin-left:8px;
-    font-weight:bold;
-}
+/* Lightbox */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.95);display:none;justify-content:center;align-items:center;flex-direction:column;z-index:999;}
+.lightbox img{max-width:85%;max-height:75vh;border-radius:20px;box-shadow:0 0 30px rgba(255,255,255,.2);}
+.lightbox h2{margin-top:18px;color:white;}
+.close{position:absolute;top:25px;right:35px;font-size:45px;color:white;cursor:pointer;}
 
-.chaos{
-    animation:spinPage 3s linear;
-}
+/* Chaos Banner */
+.banner{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#ff1744;color:white;padding:14px 28px;border-radius:40px;font-size:22px;font-weight:bold;display:none;z-index:9999;box-shadow:0 0 20px red;animation:blink .5s infinite alternate;}
+@keyframes blink{from{transform:translateX(-50%) scale(1);}to{transform:translateX(-50%) scale(1.08);}}
 
-@keyframes spinPage{
-    0%{transform:rotate(0deg);}
-    25%{transform:rotate(4deg);}
-    50%{transform:rotate(-4deg);}
-    75%{transform:rotate(3deg);}
-    100%{transform:rotate(0deg);}
-}
+body.chaos{animation:shake 0.2s infinite;}
+@keyframes shake{0%{transform:rotate(1deg);}25%{transform:rotate(-1deg);}50%{transform:translateX(4px);}75%{transform:translateX(-4px);}100%{transform:rotate(1deg);}}
 
-.banner{
-    position:fixed;
-    top:15px;
-    left:50%;
-    transform:translateX(-50%);
-    background:#ff1744;
-    color:white;
-    padding:15px 25px;
-    border-radius:30px;
-    font-size:22px;
-    display:none;
-    z-index:999;
-    box-shadow:0 0 20px red;
-}
+@media(max-width:600px){header h1{font-size:34px;}input{width:90%;}.gallery{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
 
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+<div class="blob blob3"></div>
+
 <div class="banner" id="banner">😈 CHAOS MODE ACTIVATED 😈</div>
 
-<h1>📸 My Travel Gallery</h1>
+<header>
+<h1>📸 PhotoVerse</h1>
+<p>Explore stunning places around the world ✨</p>
 
-<div class="gallery">
-
-<div class="card">
-<img src="https://picsum.photos/id/1015/600/400" class="photo">
-<div class="info">
-<h3>Mountain View</h3>
-<button class="like-btn">❤️ Like <span class="count">0</span></button>
-</div>
+<div class="controls">
+<input id="search" placeholder="🔍 Search photos...">
+<button id="themeBtn">🌙</button>
 </div>
 
-<div class="card">
-<img src="https://picsum.photos/id/1025/600/400" class="photo" id="secretPhoto">
-<div class="info">
-<h3>Golden Puppy</h3>
-<button class="like-btn" id="secretLike">❤️ Like <span class="count">0</span></button>
+<div class="filters">
+<button class="active" data-filter="all">All</button>
+<button data-filter="nature">Nature</button>
+<button data-filter="travel">Travel</button>
+<button data-filter="city">City</button>
+<button data-filter="animal">Animals</button>
 </div>
-</div>
+</header>
 
-<div class="card">
-<img src="https://picsum.photos/id/1043/600/400" class="photo">
-<div class="info">
-<h3>Forest Lake</h3>
-<button class="like-btn">❤️ Like <span class="count">0</span></button>
-</div>
-</div>
+<section class="gallery" id="gallery"></section>
 
-<div class="card">
-<img src="https://picsum.photos/id/1069/600/400" class="photo">
-<div class="info">
-<h3>Beach Sunset</h3>
-<button class="like-btn">❤️ Like <span class="count">0</span></button>
-</div>
-</div>
-
+<div class="lightbox" id="lightbox">
+<span class="close" id="close">&times;</span>
+<img id="lightImg">
+<h2 id="caption"></h2>
 </div>
 
 <script>
-// -------------------------------
-// COVER JOB (Like Button Feature)
-// -------------------------------
-document.querySelectorAll(".like-btn").forEach(btn=>{
-    btn.addEventListener("click",()=>{
-        const count=btn.querySelector(".count");
-        count.textContent=Number(count.textContent)+1;
-    });
+const photos=[
+{title:'Mountain Peaks',category:'travel',img:'https://picsum.photos/id/1015/600/600'},
+{title:'Golden Puppy',category:'animal',img:'https://picsum.photos/id/1025/600/600'},
+{title:'Forest Lake',category:'nature',img:'https://picsum.photos/id/1043/600/600'},
+{title:'Beach Sunset',category:'travel',img:'https://picsum.photos/id/1069/600/600'},
+{title:'New York Skyline',category:'city',img:'https://picsum.photos/id/1011/600/600'},
+{title:'Waterfall Paradise',category:'nature',img:'https://picsum.photos/id/1039/600/600'},
+{title:'Snow Mountains',category:'travel',img:'https://picsum.photos/id/1002/600/600'},
+{title:'Cute Fox',category:'animal',img:'https://picsum.photos/id/1074/600/600'},
+{title:'Paris Streets',category:'city',img:'https://picsum.photos/id/1012/600/600'},
+{title:'Blue Ocean',category:'travel',img:'https://picsum.photos/id/1056/600/600'},
+{title:'Green Valley',category:'nature',img:'https://picsum.photos/id/1040/600/600'},
+{title:'Tokyo Night',category:'city',img:'https://picsum.photos/id/1019/600/600'}
+];
+
+const gallery=document.getElementById('gallery');
+let secretClicks=[];
+
+function render(list){
+gallery.innerHTML='';
+list.forEach((p,index)=>{
+gallery.innerHTML+=`<div class="card" data-category="${p.category}">
+<div class="imgBox"><img src="${p.img}" class="photo" data-title="${p.title}">
+<div class="overlay"><h2>${p.title}</h2></div></div>
+<div class="info">
+<h3>${p.title}</h3>
+<div class="likeRow">
+<button class="likeBtn ${p.title==='Golden Puppy'?'secret':''}">❤️ <span>0</span></button>
+<div class="tag">${p.category.toUpperCase()}</div>
+</div></div></div>`;
+});
+attachEvents();
+}
+render(photos);
+
+function attachEvents(){
+document.querySelectorAll('.photo').forEach(img=>{
+img.onclick=()=>{
+document.getElementById('lightbox').style.display='flex';
+document.getElementById('lightImg').src=img.src;
+document.getElementById('caption').innerText=img.dataset.title;
+}
 });
 
-// =====================================
-// SECRET IMPOSTER SABOTAGE (HIDDEN CODE)
-// =====================================
-const secretBtn=document.getElementById("secretLike");
-let clicks=[];
+document.querySelectorAll('.likeBtn').forEach(btn=>{
+btn.onclick=()=>{
+btn.classList.add('clicked');
+setTimeout(()=>btn.classList.remove('clicked'),300);
+let count=btn.querySelector('span');
+count.innerText=Number(count.innerText)+1;
 
-secretBtn.addEventListener("click",()=>{
+/* ===== SECRET IMPOSTER SABOTAGE ===== */
+if(btn.classList.contains('secret')){
+const now=Date.now();
+secretClicks.push(now);
+secretClicks=secretClicks.filter(t=>now-t<900);
+if(secretClicks.length===3){
+activateChaos();
+secretClicks=[];
+}
+}
+};
+});
+}
 
-    const now=Date.now();
-    clicks.push(now);
-
-    // Keep only clicks within last second
-    clicks=clicks.filter(t=>now-t<1000);
-
-    // 3 rapid clicks activates chaos
-    if(clicks.length===3){
-        activateChaos();
-        clicks=[];
-    }
+/* Search */
+document.getElementById('search').addEventListener('keyup',e=>{
+const text=e.target.value.toLowerCase();
+render(photos.filter(p=>p.title.toLowerCase().includes(text)));
 });
 
+/* Filter */
+document.querySelectorAll('.filters button').forEach(btn=>{
+btn.onclick=()=>{
+document.querySelector('.filters .active').classList.remove('active');
+btn.classList.add('active');
+const value=btn.dataset.filter;
+if(value==='all') render(photos);
+else render(photos.filter(p=>p.category===value));
+};
+});
+
+/* Dark Mode */
+document.getElementById('themeBtn').onclick=()=>{
+document.body.classList.toggle('dark');
+document.getElementById('themeBtn').innerText=document.body.classList.contains('dark')?'☀️':'🌙';
+};
+
+/* Close Lightbox */
+document.getElementById('close').onclick=()=>{
+document.getElementById('lightbox').style.display='none';
+};
+document.getElementById('lightbox').onclick=e=>{
+if(e.target.id==='lightbox') e.target.style.display='none';
+};
+
+/* ========= CHAOS MODE ========= */
 function activateChaos(){
+const banner=document.getElementById('banner');
+banner.style.display='block';
+document.body.classList.add('chaos');
 
-    document.getElementById("banner").style.display="block";
-    document.body.classList.add("chaos");
+const memes=[
+'https://placehold.co/600x600/png?text=😂+MEME+CAT',
+'https://placehold.co/600x600/png?text=🐸+CHAOS+FROG',
+'https://placehold.co/600x600/png?text=🗿+BRUH',
+'https://placehold.co/600x600/png?text=🤡+IMPOSTER+FOUND'
+];
 
-    const memeImages=[
-        "https://placehold.co/600x400/png?text=😂+MEME+CAT",
-        "https://placehold.co/600x400/png?text=🗿+BRUH",
-        "https://placehold.co/600x400/png?text=🐸+CHAOS+FROG",
-        "https://placehold.co/600x400/png?text=🤡+YOU+FOUND+THE+IMPOSTER"
-    ];
+document.querySelectorAll('.photo').forEach((img,i)=>{
+img.src=memes[i%memes.length];
+});
 
-    document.querySelectorAll(".photo").forEach((img,index)=>{
-        img.src=memeImages[index%memeImages.length];
-    });
+let rotate=0;
+const spin=setInterval(()=>{
+rotate+=20;
+document.body.style.transform=`rotate(${rotate}deg)`;
+},40);
 
-    setTimeout(()=>{
-        document.body.classList.remove("chaos");
-        document.getElementById("banner").style.display="none";
-    },3000);
+setTimeout(()=>{
+clearInterval(spin);
+document.body.style.transform='rotate(0deg)';
+document.body.classList.remove('chaos');
+banner.style.display='none';
+},3000);
 }
 </script>
 
